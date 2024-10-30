@@ -160,7 +160,10 @@ def generate_maze_trails(maze, start_point, end_point):
         # Advance to chosen tile
         if not next_tiles:
             # Dead end - look for different path
-            current_tile = mined_tiles.pop()
+            if len(mined_tiles) == 1:
+                current_tile = mined_tiles[0]
+            else:
+                current_tile = mined_tiles.pop()
             next_tile = possible_break_wall(maze, current_tile[0], current_tile[1])
         else:
             # Choose random tile to advance
@@ -187,8 +190,10 @@ def maze_generator(width=maze_width, height=maze_height):
     (rows_len, cols_len) = maze.shape
     
     # Set start and end points
-    start_point = (0, random.randrange(0, cols_len))
-    end_point = (rows_len - 1, random.randrange(0, cols_len))
+    #start_point = (0, random.randrange(0, cols_len))
+    #end_point = (rows_len - 1, random.randrange(0, cols_len))
+    start_point = (0,3)
+    end_point = (4, 4)
     maze[start_point] = MazeTiles.TRAIL
     maze[end_point] = MazeTiles.TRAIL
 
