@@ -179,34 +179,9 @@ def generate_maze_trails(maze, start_point, end_point):
         # Get possible options for next tile    
         next_tiles = get_possible_next_tile(maze, current_tile[0], current_tile[1], end_point)
 
-def visualize_maze(maze, start_point, end_point):
-    # Transfering to int from Enum objects
-    int_maze = np.vectorize(lambda x: x.value)(maze)
-    print(int_maze)
-
-    # Setting starting point and end point in int maze
-    int_maze[start_point] = 3
-    int_maze[end_point] = 4
-
-    # Define a custom color map with specific colors for each value:
-    # 0 and 1 -> black, 2 -> green, 3 and 4 -> blue
-    cmap = ListedColormap([color_wall, color_path, color_start_end])
-
-    # Map the values in maze to the colors:
-    # - 0 and 1 will both map to 0 (black)
-    # - 2 remains 1 (green)
-    # - 3 and 4 will both map to 2 (blue)
-    display_maze = np.where((int_maze == 3) | (int_maze == 4), 2,
-                            np.where((int_maze == 0) | (int_maze == 1), 0, 1))
-
-    # Plot the maze
-    plt.imshow(display_maze, cmap=cmap, interpolation='nearest')
-    plt.axis('off')  # Hide the axis
-    plt.show()
-
-def maze_generator():
+def maze_generator(width=maze_width, height=maze_height):
     # Set empty maze matrix
-    maze_size = (maze_width, maze_height)
+    maze_size = (width, height)
     maze = np.full(maze_size, MazeTiles.UNDEFINED, dtype=object)
 
     (rows_len, cols_len) = maze.shape
@@ -222,8 +197,11 @@ def maze_generator():
     # Mine maze paths
     generate_maze_trails(maze, start_point, end_point)
 
-    # Visualize maze in graph
-    visualize_maze(maze, start_point, end_point)
+    # Transfering to int from Enum objects
+    int_maze = np.vectorize(lambda x: x.value)(maze)
+    int_maze[int_maze == 0] = 1
+    int_maze[int_maze == 2] = 0
+    print(int_maze)
 
-if __name__ == "__main__":
-    maze_generator()
+    # Return maze and start and end points
+    return(int_maze, start_point, end_point)
