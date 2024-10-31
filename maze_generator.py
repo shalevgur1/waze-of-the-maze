@@ -190,10 +190,8 @@ def maze_generator(width=maze_width, height=maze_height):
     (rows_len, cols_len) = maze.shape
     
     # Set start and end points
-    #start_point = (0, random.randrange(0, cols_len))
-    #end_point = (rows_len - 1, random.randrange(0, cols_len))
-    start_point = (0,3)
-    end_point = (4, 4)
+    start_point = (0, random.randrange(0, cols_len))
+    end_point = (rows_len - 1, random.randrange(0, cols_len))
     maze[start_point] = MazeTiles.TRAIL
     maze[end_point] = MazeTiles.TRAIL
 
