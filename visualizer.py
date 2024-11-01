@@ -3,48 +3,6 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import numpy as np
 
-# ***************************************
-#          CONFIGURATION AREA
-# ***************************************
-
-# Visualization settings
-color_path = 'green'
-color_wall = 'black'
-color_start_end = 'blue'
-
-# ***************************************
-
-def visualize_maze(maze, start_point, end_point):
-    # Set the starting and ending points in the maze
-    maze[start_point] = 3
-    maze[end_point] = 4
-
-    # Define a custom color map with specific colors for each value:
-    # 0 -> green, 1 -> black, 3 and 4 -> blue
-    cmap = ListedColormap([color_path, color_wall, color_start_end])
-
-    # Map the values in the maze to the colors:
-    # - 0 maps to 0 (green)
-    # - 1 maps to 1 (black)
-    # - 3 and 4 both map to 2 (blue)
-    display_maze = np.where((maze == 3) | (maze == 4), 2,
-                            np.where(maze == 0, 0, 1))
-
-    # Plot the maze
-    plt.imshow(display_maze, cmap=cmap, interpolation='nearest')
-    plt.axis('off')  # Hide the axis
-    plt.show()
-
-def set_player(maze, position):
-    pass
-
-def visualize_walk(maze, old_position, new_position):
-    pass
-
-def delete_player(maze, position):
-    pass
-
-
 class Visualizer:
     """
         Class for visualize the maze and the player walking in the maze.
@@ -61,7 +19,7 @@ class Visualizer:
         self.end_point = end_point      # Ending tile of the maze
         self.player_position = start_point # Set player position to starting point
 
-    def visualize_maze(self):
+    def visualize_maze(self, visual_type="normal"):
         """Visualize the maze with the start and end points."""
         # Create a display maze based on the original maze
         display_maze = np.where((self.maze == 0), 0,  # Green path
@@ -80,15 +38,20 @@ class Visualizer:
         # Plot the maze
         plt.imshow(display_maze, cmap=cmap, interpolation='nearest')
         plt.axis('off')  # Hide the axis
-        plt.show()
+        if visual_type == "walk":
+            plt.pause(0.2)
+        else:
+            plt.show()
 
     def visualize_walk(self, new_position):
         """Visualize the player walking from one position to another."""
         # Change player position
         self.maze[self.player_position] = 0
         self.maze[new_position] = 2 
+        # Mark/Unmark as commet depends if you want to show solution as one tile moving or line
+        # self.player_position = new_position
 
-        self.visualize_maze()
+        self.visualize_maze(visual_type="walk")
 
     def reset(self):
         """Remove the player from the maze."""

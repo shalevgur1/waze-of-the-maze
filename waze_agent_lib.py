@@ -1,7 +1,6 @@
 import numpy as np
 from enum import Enum
 import visualizer
-import time
 
 class Action(Enum):
         UP = 0
@@ -83,7 +82,7 @@ class WazeAgent:
     def _step(self, state, action):
         """
             Define movement logic here based on the action
-            Update position, determine reward and done status, and return them
+            Update position, determine reward and end of maze status, and return them
         """
         row, col = state
         if action == Action.UP:  # Check if action is UP
@@ -152,9 +151,8 @@ class WazeAgent:
         # Start walking
         while not end_of_maze:
             visualObj.visualize_walk(state)
-            time.sleep(1)
-            action = self._choose_action()
-            new_state, end_of_maze = self._step(state, action)  # Moves the agent, returns new state and end-of-maze flag
+            action = self._choose_action(state)
+            new_state, _, end_of_maze = self._step(state, action)  # Moves the agent, returns new state and end-of-maze flag
             state = new_state
 
 
