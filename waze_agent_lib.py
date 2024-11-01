@@ -1,6 +1,7 @@
 import numpy as np
 from enum import Enum
 import visualizer
+import time
 
 class Action(Enum):
         UP = 0
@@ -15,7 +16,8 @@ class WazeAgent:
     technique to navigate and solve the maze.
     """
 
-    reward = -1  # Movement cost. Default reward value, can be adjusted as needed
+    reward = -1.0             # Movement cost. Default reward value, can be adjusted as needed
+    end_tile_reward = 10.0    # Reward for completing the maze
 
     def __init__(self, maze, starting_tile, end_tile, learning_rate=0.1, discount_factor=0.9, epsilon=1.0, epsilon_decay=0.99):
         # Init properties
@@ -68,14 +70,14 @@ class WazeAgent:
             # Choose an action based on the epsilon-greedy strategy.
             if np.random.rand() < self.epsilon:
                 # Explore: Choose a random valid action
-                valid_actions = [a for a in range(len(Action)) if self.q_table[state[0], state[1], a] is not None]
+                valid_actions = [a for a in range(len(Action)) if not np.isnan(self.q_table[state[0], state[1], a])]
                 action = np.random.choice(valid_actions)
             else:
                 # Exploit: Choose the action with the max Q-value
                 q_values = self.q_table[state[0], state[1]]
-                action = np.argmax([q if q is not None else -np.inf for q in q_values])
+                action = np.argmax([q if not np.isnan(q) else -np.inf for q in q_values])
 
-            action = Action(max_q_index)  # Convert to Action enum
+            action = Action(action)  # Convert to Action enum
             return action
 
     def _step(self, state, action):
@@ -95,8 +97,8 @@ class WazeAgent:
 
         # Return values and set stop iteration for end of maze tile
         new_state = (new_row, new_col)
-        if new_state == self.end_tile: return new_state, True
-        return new_state, False
+        if new_state == self.end_tile: return new_state, self.end_tile_reward, True
+        return new_state, self.reward, False
 
     def learn(self, episodes=1000):
         """
@@ -116,16 +118,17 @@ class WazeAgent:
             
             # Start exploring
             while not end_of_maze:
-                action = self._choose_action()
-                new_state, end_of_maze = self._step(state, action)  # Moves the agent, returns new state and end-of-maze flag
+                action = self._choose_action(state)
+                print(action)
+                new_state, reward, end_of_maze = self._step(state, action)  # Moves the agent, returns new state and end-of-maze flag
 
                 # Update Q-value for the current state-action pair
-                old_value = self.q_table[state[0], state[1], action]
-                next_max = np.max(self.q_table[new_state[0], new_state[1]])  # Max Q-value for the next state
+                old_value = self.q_table[state[0], state[1], action.value]
+                next_max = np.nanmax(self.q_table[new_state[0], new_state[1]])  # Max Q-value for the next state
 
                 # Q-learning update rule (Bellman Equasion)
-                new_value = (1 - self.learning_rate) * old_value + self.learning_rate * (self.reward + self.discount_factor * next_max)
-                self.q_table[state[0], state[1], action] = new_value
+                new_value = (1 - self.learning_rate) * old_value + self.learning_rate * (reward + self.discount_factor * next_max)
+                self.q_table[state[0], state[1], action.value] = new_value
 
                 # Move to the next state
                 state = new_state
@@ -136,7 +139,7 @@ class WazeAgent:
         # End learning logging message
         print("Greetings! I am the noble agent, and I stand before thee, well-educated and wise. Through my arduous journeys within the labyrinth, I have gleaned much knowledge and experience.")
 
-    def walk_visualized(self):
+    def walk_visualized(self, visualObj):
         """
             Let the agent walk according to current Q-Table.
             For testing after the learning phase.
@@ -148,6 +151,8 @@ class WazeAgent:
 
         # Start walking
         while not end_of_maze:
+            visualObj.visualize_walk(state)
+            time.sleep(1)
             action = self._choose_action()
             new_state, end_of_maze = self._step(state, action)  # Moves the agent, returns new state and end-of-maze flag
             state = new_state
