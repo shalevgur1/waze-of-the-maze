@@ -1,4 +1,4 @@
-# Maze Generator
+# Waze of the Maze
 
 This project demonstrates the fundamental principles of Reinforcement Learning (RL) through the implementation of a Q-Learning algorithm in a maze-solving agent. 
 The agent learns to navigate through mazes by making optimal decisions based on exploration and reward-based learning. 
